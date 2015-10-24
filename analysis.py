@@ -38,18 +38,18 @@ def run():
     '''
     
     t0 = time()
-    n_topics = 50
+    n_topics = 100
     n_top_posts = 20
-    n_top_words = 20
+    n_top_words = 50
     ngram = 1
-    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,ngram))
-
+   
     dataFname = '../DSSG_unleashfootball/word_splits_stopwords'
     originalTexts = '../DSSG_unleashfootball/Original_posts'
     dat = cPickle.load(open(dataFname))
     orig = cPickle.load(open(originalTexts))
-
-    tfidf = vectorizer.fit_transform([' '.join(x) for x in dat])
+    
+    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2,ngram_range=(1,ngram))
+    tfidf = vectorizer.fit_transform([' '.join(x) for x in dat]) 
     nmf = NMF(n_components=n_topics, random_state=1).fit(tfidf)
     print("Done fitting NMF in %0.3fs." % (time() - t0))
 
