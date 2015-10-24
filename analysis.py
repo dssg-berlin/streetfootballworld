@@ -34,12 +34,15 @@ def run():
     '''
     
     t0 = time()
-    n_topics = 10
-    n_top_words = 100
+    n_topics = 100
+    n_top_posts = 5
+    n_top_words = 10
     vectorizer = TfidfVectorizer(max_df=0.95, min_df=2)
 
-    fname = '/Users/felix/Code/Python/streetfootballworld/DSSG_unleashfootball/word_splits_stopwords'
-    dat = cPickle.load(open(fname))
+    dataFname = '../DSSG_unleashfootball/word_splits_stopwords'
+    originalTexts = '../DSSG_unleashfootball/Original_posts'
+    dat = cPickle.load(open(dataFname))
+    orig = cPickle.load(open(originalTexts))
 
     tfidf = vectorizer.fit_transform([' '.join(x) for x in dat])
     nmf = NMF(n_components=n_topics, random_state=1).fit(tfidf)
@@ -55,7 +58,12 @@ def run():
         topicDict = {}
         topicDict['sentiment'] = sentimentTopics[topic_idx]
         topicDict['keywords'] = [{'keyword':feature_names[i],'weight':nmf.components_[topic_idx,i]} for i in topic.argsort()[:-n_top_words - 2:-1]]
- 
+        
+        # get some representative posts
+        ranking = tfidf.dot(nmf.components_[topic_idx,:]).argsort()[:-n_top_posts][::-1]
+        topicDict['posts'] = [{'post':orig[i]} for i in ranking]
+        
+        #  
         print("Topic #%d (Sentiment %f):" %(topic_idx,sentimentTopics[topic_idx]))
         print(" ".join([feature_names[i]
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
