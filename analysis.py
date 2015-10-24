@@ -37,7 +37,7 @@ def run():
     n_topics = 100
     n_top_posts = 5
     n_top_words = 10
-    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2)
+    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,3))
 
     dataFname = '../DSSG_unleashfootball/word_splits_stopwords'
     originalTexts = '../DSSG_unleashfootball/Original_posts'
@@ -65,6 +65,6 @@ def run():
         
         #  
         print("Topic #%d (Sentiment %f):" %(topic_idx,sentimentTopics[topic_idx]))
-        print(" ".join([feature_names[i]
+        print(" | ".join([feature_names[i]
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
         open('topic-%d.json'%topic_idx,'wb').write(json.dumps(topicDict))
