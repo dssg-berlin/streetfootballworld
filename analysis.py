@@ -4,7 +4,12 @@ from sklearn.decomposition import NMF
 import cPickle
 from time import time
 
+
 def run():
+'''
+Standard topic analysis copied from scikit learn example on 
+http://scikit-learn.org/stable/auto_examples/applications/topics_extraction_with_nmf.html
+'''
     t0 = time()
     n_topics = 100
     n_top_words = 100
