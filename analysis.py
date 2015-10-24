@@ -4,7 +4,7 @@ from sklearn.decomposition import NMF
 import cPickle
 from time import time
 import pandas as pd
-from scipy import zeros
+from scipy import zeros,corrcoef,array,sparse
 import pdb
 import json
 
@@ -24,8 +24,12 @@ def get_sentiments(data,vectorizer,sentimentDict):
         if vectorizer.vocabulary_.has_key(word):
             sentivec[vectorizer.vocabulary_[word]] = sentimentDict[word]
     
-    # project data into sentiment-subspace
-    return data.dot(sentivec)
+    # compute sentiments for each
+    if sparse.issparse(data):
+        sentiments = [corrcoef(array(data[idx,:].todense()),sentivec)[1,0] for idx in range(data.shape[0])]
+    else:
+        sentiments = [corrcoef(data[idx,:],sentivec)[1,0] for idx in range(data.shape[0])]
+    return array(sentiments)
 
 def run():
     '''
@@ -49,6 +53,8 @@ def run():
     nmf = NMF(n_components=n_topics, random_state=1).fit(tfidf)
     print("Done fitting NMF in %0.3fs." % (time() - t0))
 
+    topic_assignments = nmf.transform(tfidf).argmax(axis=1)
+
     feature_names = vectorizer.get_feature_names()
     
     sentimentWords = json.loads(open('sentiWords.json').read())#load_sentiment()
@@ -56,14 +62,18 @@ def run():
     sentiments = get_sentiments(tfidf,vectorizer,sentimentWords)
     topics = []
     for topic_idx, topic in enumerate(nmf.components_):
-        
         topicDict = {}
         topicDict['sentiment'] = sentimentTopics[topic_idx]
         topicDict['keywords'] = [{'keyword':feature_names[i],'weight':nmf.components_[topic_idx,i]} for i in topic.argsort()[:-n_top_words - 2:-1]]
         
+        topicDict['label'] = topicDict['keywords'][0]['keyword']
+
+        # count number of posts in this topic
+        topicDict['postCount'] = (topic_assignments==topic_idx).sum()
+
         # get some representative posts
         ranking = tfidf.dot(nmf.components_[topic_idx,:])
-        ranks = ranking.argsort()[:-n_top_posts][::-1]
+        ranks = ranking.argsort()[-n_top_posts:][::-1]
         topicDict['posts'] = []
         for item in ranks:
             topicDict['posts'].append({'post':orig[item],'relevance':ranking[item],'sentiment':sentiments[item]})
