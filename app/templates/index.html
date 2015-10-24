@@ -1,38 +1,59 @@
 {% extends "layout.html" %}
 {% block content %}
-<script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
-<script>
-    $(document).ready(function () {
-        $("#posts").tablesorter();
-    });
-</script>
-<div class="container">
-    <div class="row">
-        <div class="col-xs-6">
-            <form action="" method="post" name="keyword">
-                {{ form.keyword.label }}
-                {{ form.keyword }}
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Keyword Visualizer</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <form action="" method="post" name="keyword" class="navbar-form navbar-left">
+                <div class="form-group">
+                    {{ form.keyword(class_= "form-control", placeholder="Keyword") }}
+                </div>
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
         </div>
-        <div class="col-xs-6" id="wordcloud">
-            {% include "wordcloud.html" %}
-        </div>
+        <!-- /.navbar-collapse -->
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <table class="table tablesorter" id="posts">
-                <thead>
-                <th>Relevance</th>
-                <th>Sentiment</th>
-                <th>Text</th>
-                </thead>
-                <tbody>
-                {% for post in posts %}
-                {% include "post.html" %}
-                {% endfor %}
-                </tbody>
-            </table>
+</nav>
+<div class="container">
+    <script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#posts").tablesorter();
+        });
+    </script>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6">
+                
+            </div>
+            <div class="col-xs-6" id="wordcloud">
+                {% include "wordcloud.html" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table tablesorter" id="posts">
+                    <thead>
+                    <th>Relevance</th>
+                    <th>Sentiment</th>
+                    <th>Text</th>
+                    </thead>
+                    <tbody>
+                    {% for post in posts %}
+                    {% include "post.html" %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
