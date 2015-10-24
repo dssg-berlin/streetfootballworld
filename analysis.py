@@ -34,9 +34,9 @@ def run():
     '''
     
     t0 = time()
-    n_topics = 100
+    n_topics = 10
     n_top_posts = 20
-    n_top_words = 100
+    n_top_words = 10
     ngram = 1
     vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,ngram))
 
