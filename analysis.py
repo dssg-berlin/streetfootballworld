@@ -38,9 +38,9 @@ def run():
     '''
     
     t0 = time()
-    n_topics = 10
+    n_topics = 50
     n_top_posts = 20
-    n_top_words = 10
+    n_top_words = 20
     ngram = 1
     vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,ngram))
 
@@ -61,6 +61,7 @@ def run():
     sentimentTopics = get_sentiments(nmf.components_,vectorizer,sentimentWords)    
     sentiments = get_sentiments(tfidf,vectorizer,sentimentWords)
     topics = []
+    keywords2Topic = {}
     for topic_idx, topic in enumerate(nmf.components_):
         topicDict = {}
         topicDict['sentiment'] = sentimentTopics[topic_idx]
@@ -78,9 +79,12 @@ def run():
         for item in ranks:
             topicDict['posts'].append({'post':orig[item],'relevance':ranking[item],'sentiment':sentiments[item]})
         
+        keywords2Topic = dict(keywords2Topic.items() + [ (word['keyword'],topic_idx) for word in topicDict['keywords']])
+
         print("Topic #%d (Sentiment %f):" %(topic_idx,sentimentTopics[topic_idx]))
         print(" | ".join([feature_names[i]
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
         topics.append(topicDict)    
     
     open('topics.json','wb').write(json.dumps(topics))
+    open('keywords2Topic.json','wb').write(json.dumps(keywords2Topic))
