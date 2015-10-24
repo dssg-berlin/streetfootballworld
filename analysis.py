@@ -35,9 +35,10 @@ def run():
     
     t0 = time()
     n_topics = 100
-    n_top_posts = 5
-    n_top_words = 10
-    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,3))
+    n_top_posts = 20
+    n_top_words = 100
+    ngram = 1
+    vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, ngram_range=(1,ngram))
 
     dataFname = '../DSSG_unleashfootball/word_splits_stopwords'
     originalTexts = '../DSSG_unleashfootball/Original_posts'
@@ -46,25 +47,30 @@ def run():
 
     tfidf = vectorizer.fit_transform([' '.join(x) for x in dat])
     nmf = NMF(n_components=n_topics, random_state=1).fit(tfidf)
-    print("done in %0.3fs." % (time() - t0))
+    print("Done fitting NMF in %0.3fs." % (time() - t0))
 
     feature_names = vectorizer.get_feature_names()
     
     sentimentWords = json.loads(open('sentiWords.json').read())#load_sentiment()
     sentimentTopics = get_sentiments(nmf.components_,vectorizer,sentimentWords)    
-
+    sentiments = get_sentiments(tfidf,vectorizer,sentimentWords)
     topics = []
     for topic_idx, topic in enumerate(nmf.components_):
+        
         topicDict = {}
         topicDict['sentiment'] = sentimentTopics[topic_idx]
         topicDict['keywords'] = [{'keyword':feature_names[i],'weight':nmf.components_[topic_idx,i]} for i in topic.argsort()[:-n_top_words - 2:-1]]
         
         # get some representative posts
-        ranking = tfidf.dot(nmf.components_[topic_idx,:]).argsort()[:-n_top_posts][::-1]
-        topicDict['posts'] = [{'post':orig[i]} for i in ranking]
+        ranking = tfidf.dot(nmf.components_[topic_idx,:])
+        ranks = ranking.argsort()[:-n_top_posts][::-1]
+        topicDict['posts'] = []
+        for item in ranks:
+            topicDict['posts'].append({'post':orig[item],'relevance':ranking[item],'sentiment':sentiments[item]})
         
-        #  
         print("Topic #%d (Sentiment %f):" %(topic_idx,sentimentTopics[topic_idx]))
         print(" | ".join([feature_names[i]
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
-        open('topic-%d.json'%topic_idx,'wb').write(json.dumps(topicDict))
+        topics.append(topicDict)    
+    
+    open('topics.json','wb').write(json.dumps(topics))
