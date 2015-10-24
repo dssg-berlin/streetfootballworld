@@ -1,19 +1,18 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 <script src="{{ url_for('static', filename='js/d3.layout.cloud.js') }}"></script>
 <script>
 
   var fill = d3.scale.category20(),
-      file = src="{{ url_for('static', filename='resources/topic-5.json') }}", // edit this var to load json for different topics
+      file = src="{{ url_for('static', filename='resources/topics.json') }}", // edit this var to load json for different topics
       filter_val = .001;  // edit this var to set filter weight for keywords
 
 d3.json(file, function(data) {
 
   $(document).ready(function() {
       width = $("#wordcloud").width();
-      height = width;
+      height = width / 3 * 4;
       d3.layout.cloud().size([width, height])
       .words(
-      data.keywords
+      data[0].keywords
         .filter(function(d) { return d.weight > filter_val; })
         .map(function(d) {
         return {text: d.keyword, size: 10 + d.weight * 50};
