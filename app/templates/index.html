@@ -3,14 +3,16 @@
   <div class="">
     <div class="container">
       <div class="row">
-        <div class="col-xs-3">
+        <div class="col-xs-6">
           <form action="" method="post" name="keyword">
             {{ form.keyword.label }}
             {{ form.keyword }}
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
         </div>
-        <div class="col-xs-9"><h1>{{ keyword }}</h1></div>
+        <div class="col-xs-6" id="wordcloud">
+          {% include "wordcloud.html" %}
+        </div>
       </div>
     </div>
   </div>
