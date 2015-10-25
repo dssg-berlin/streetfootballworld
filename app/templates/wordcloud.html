@@ -5,18 +5,15 @@
             file = src = "{{ url_for('static', filename='resources/topics.json') }}", // edit this var to load json for different topics
             filter_val = .001;  // edit this var to set filter weight for keywords
 
-    var drawWords = function (label) {
-        d3.json(file, function (data) {
+    var drawWords = function (data) {
 
             $(document).ready(function () {
                 width = $("#wordcloud").width();
                 height = width / 3 * 4;
 
-                var topic = data.filter(function (d) { return d.label == label; })[0];
-
                 d3.layout.cloud().size([width, height])
                         .words(
-                            topic.keywords
+                            data.keywords
                                 .filter(function (d) {
                                     return d.weight > filter_val;
                                 })
@@ -33,7 +30,7 @@
                         .on("end", draw)
                         .start();
 
-                updatePosts(topic.posts);
+                updatePosts(data.posts);
             });
 
             function updatePosts(posts) {
@@ -73,7 +70,6 @@
                             return d.text;
                         });
             }
-        })
     };
 
 </script>
