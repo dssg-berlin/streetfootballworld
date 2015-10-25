@@ -63,6 +63,7 @@
                     })
                     .attr("height", y.rangeBand())
                     .on("click", function (d) {
+                    console.log(d)
                         return drawWords(d.label);
                     });
 

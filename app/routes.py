@@ -10,7 +10,8 @@ app.config.from_object('config')
 def index():
     form = KeywordForm()
     keyword = request.form.get('keyword', '')
-    posts = json.load(open("./static/resources/topics.json"))
+    posts = json.load(open("../topics.json"))
+
     posts = posts[0]['posts']
     return render_template('index.html', form=form, keyword=keyword, posts=posts)
 
