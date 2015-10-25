@@ -1,6 +1,6 @@
 <script>
     $(document).ready(function () {
-        var n_topics = 25; // edit this to adjust number of topics displayed
+        var n_topics = 30; // edit this to adjust number of topics displayed
 
         var margin = {top: 40, right: 10, bottom: 10, left: 100},
         width = $("#barchart").width() - margin['left'] - margin['right'];
@@ -41,9 +41,9 @@
 
             var topics = data.sort(compare).slice(0, n_topics);
 
-            x.domain(d3.extent(topics, function (d) {
+            x.domain([ 0, d3.max(topics, function (d) {
                 return d.postCount;
-            })).nice();
+            })]).nice();
             y.domain(topics.map(function (d) {
                 return d.label;
             }));

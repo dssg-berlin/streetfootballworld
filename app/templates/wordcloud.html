@@ -13,7 +13,6 @@
                 height = width / 3 * 4;
 
                 var topic = data.filter(function (d) { return d.label == label; })[0];
-                console.log(topic);
 
                 d3.layout.cloud().size([width, height])
                         .words(
