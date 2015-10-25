@@ -24,12 +24,6 @@
     </div>
 </nav>
 <div class="container">
-    <script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
-    <script>
-        $(document).ready(function () {
-            $("#posts").tablesorter();
-        });
-    </script>
     <div class="container">
         <div class="row">
             <div class="col-xs-6" id="barchart">
@@ -41,8 +35,10 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <table class="table tablesorter" id="posts">
+                <table class="table" id="posts">
                     <thead>
+                    <th>Relevance</th>
+                    <th>Sentiment</th>
                     <th>Text</th>
                     </thead>
                     <tbody>
