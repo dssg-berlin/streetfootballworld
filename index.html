@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 960px;
+  height: 500px;
+  position: relative;
+}
+
+path {
+  fill-rule: evenodd;
+  stroke: #333;
+  stroke-width: 2px;
+}
+
+  #xaxis .domain {
+    fill:none;
+    stroke:#000;
+  }
+  #xaxis text, #yaxis text {
+    font-size: 12px;
+  }
+
+</style>
+<body> 
+  <div id="barchart"/>
+  <div id="wordcloud"/>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<script src="d3.layout.cloud.js"></script>
+
+<script>
+
+  var fill = d3.scale.category20(),
+      file = "topics.json", // edit this var to load json for different topics
+      filter_val = 0.02;  // edit this var to set filter weight for keywords
+
+var drawWords = function(index) {
+      d3.json(file, function(data) {
+
+        d3.layout.cloud().size([300, 300])
+            .words(
+               data[index].keywords
+              .filter(function(d) { return d.weight > filter_val; })
+              .map(function(d) {
+                            return {text: d.keyword, size: 10 + d.weight * 50};
+                          }))
+            .rotate(function() { return ~~(Math.random() * 2) * 90; })
+            .font("Impact")
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw)
+            .start();
+
+        function draw(words) {
+          d3.selectAll("#wordcloud svg").remove();
+          d3.select("#wordcloud").append("svg")
+              .attr("width", 300)
+              .attr("height", 300)
+            .append("g")
+              .attr("transform", "translate(150,150)")
+            .selectAll("text")
+              .data(words)
+            .enter().append("text")
+              .style("font-size", function(d) { return d.size + "px"; })
+              .style("font-family", "Impact")
+              .style("fill", function(d, i) { return fill(i); })
+              .attr("text-anchor", "middle")
+              .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+            .on("click", function(d) { return d.text })
+              .text(function(d) { return d.text; });
+        }
+      });
+}
+</script>
+<script>
+
+var topics;
+
+var margin = {top: 40, right: 10, bottom: 10, left: 100},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.linear()
+    .range([0, width]);
+
+var y = d3.scale.ordinal()
+    .rangeRoundBands([0, height], .2);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("#barchart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var cols = d3.scale.category20b();
+
+
+d3.json("topics.json", function(data) {
+
+    topics = data;
+
+  x.domain(d3.extent(data, function(d) { return d.postCount; })).nice();
+  y.domain(data.map(function(d) { return d.label; }));
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .style("fill", function(d) { return cols(d.label); })
+      .attr("x", 0)
+      .attr("y", function(d) { return y(d.label); })
+      .attr("width", function(d) { return x(d.postCount); })
+      .attr("height", y.rangeBand())
+      .on("click", function(d, i) { return drawWords(i); });
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+});
+
+
+</script>
+</html>

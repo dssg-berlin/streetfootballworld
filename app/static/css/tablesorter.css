@@ -1,0 +1,20 @@
+#posts thead {
+  cursor: pointer;
+}
+
+#posts thead tr th span {
+  padding-right: 20px;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+
+#posts thead tr th.headerSortUp, #posts thead tr th.headerSortDown {
+  background: #ededed;
+}
+
+#posts thead tr th.headerSortUp span {
+  background-image: url('static/resources/asc.gif');
+}
+#posts thead tr th.headerSortDown span {
+  background-image: url('static/resources/desc.gif');
+}
