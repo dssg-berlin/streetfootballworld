@@ -8,11 +8,9 @@ app.config.from_object('config')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    form = KeywordForm()
-    keyword = request.form.get('keyword', '')
     posts = json.load(open("./static/resources/topics.json"))
     posts = posts[0]['posts']
-    return render_template('index.html', form=form, keyword=keyword, posts=posts)
+    return render_template('index.html', posts=posts)
 
 
 if __name__ == '__main__':
