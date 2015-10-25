@@ -5,15 +5,19 @@
             file = src = "{{ url_for('static', filename='resources/topics.json') }}", // edit this var to load json for different topics
             filter_val = .001;  // edit this var to set filter weight for keywords
 
-    var drawWords = function (index) {
+    var drawWords = function (label) {
         d3.json(file, function (data) {
 
             $(document).ready(function () {
                 width = $("#wordcloud").width();
                 height = width / 3 * 4;
+
+                var topic = data.filter(function (d) { return d.label == label; })[0];
+                console.log(topic);
+
                 d3.layout.cloud().size([width, height])
                         .words(
-                        data[index].keywords
+                            topic.keywords
                                 .filter(function (d) {
                                     return d.weight > filter_val;
                                 })
@@ -28,17 +32,22 @@
                             return d.size;
                         })
                         .on("end", draw)
-                        .start()
+                        .start();
+
+                updatePosts(topic.posts);
             });
 
-            function draw(words) {
-                d3.select("#wordcloud").selectAll("*").remove();
-                d3.select("#posts").select("tbody").selectAll("*").remove();
-                d3.select("#posts").select("tbody").selectAll("tr").data(data[index].posts).enter().append("tr").selectAll("td")
+            function updatePosts(posts) {
+                d3.select("#posts").select("tbody").selectAll("tr").remove();
+                d3.select("#posts").select("tbody").selectAll("tr").data(posts).enter().append("tr").selectAll("td")
                         .data(function (d) {
                             sentiment = d.sentiment > 0 ? '<i class="fa fa-lg fa-smile-o"></i>' : '<i class="fa fa-lg fa-frown-o"></i>';
                             return [d3.round(d.relevance, 2), sentiment, d.post];
                         }).enter().append("td").html(function(d) {return d;});
+            }
+
+            function draw(words) {
+                d3.select("#wordcloud").selectAll("*").remove();
                 d3.select("#wordcloud").append("svg")
                         .attr("width", width)
                         .attr("height", height)
