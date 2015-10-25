@@ -25,11 +25,12 @@ def get_sentiments(data,vectorizer,sentimentDict):
             sentivec[vectorizer.vocabulary_[word]] = sentimentDict[word]
     
     # compute sentiments for each
-    if sparse.issparse(data):
-        sentiments = [corrcoef(array(data[idx,:].todense()),sentivec)[1,0] for idx in range(data.shape[0])]
-    else:
-        sentiments = [corrcoef(data[idx,:],sentivec)[1,0] for idx in range(data.shape[0])]
-    return array(sentiments)
+    #if sparse.issparse(data):
+    #    sentiments = [corrcoef(array(data[idx,:].todense()),sentivec)[1,0] for idx in range(data.shape[0])]
+    #else:
+    #    sentiments = [corrcoef(data[idx,:],sentivec)[1,0] for idx in range(data.shape[0])]
+    #return array(sentiments)
+    return data.dot(sentivec)
 
 def run():
     '''
