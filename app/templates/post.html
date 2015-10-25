@@ -1,3 +1,5 @@
 <tr>
+    <td>{{ "%.2f" | format(post.relevance) }}</td>
+    <td><i class="fa fa-lg fa-{{ 'smile-o' if post.sentiment > 0 else 'frown-o' }}"></i></td>
     <td>{{ post.post }}</td>
 </tr>

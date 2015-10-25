@@ -1,6 +1,6 @@
 <script>
     $(document).ready(function () {
-        var topics;
+        var n_topics = 25; // edit this to adjust number of topics displayed
 
         var margin = {top: 40, right: 10, bottom: 10, left: 100},
         width = $("#barchart").width() - margin['left'] - margin['right'];
@@ -39,17 +39,17 @@
 
         d3.json("{{ url_for('static', filename='resources/topics.json') }}", function (data) {
 
-            topics = data.sort(compare);
+            var topics = data.sort(compare).slice(0, n_topics);
 
-            x.domain(d3.extent(data, function (d) {
+            x.domain(d3.extent(topics, function (d) {
                 return d.postCount;
             })).nice();
-            y.domain(data.map(function (d) {
+            y.domain(topics.map(function (d) {
                 return d.label;
             }));
 
             svg.selectAll(".bar")
-                    .data(data)
+                    .data(topics)
                     .enter().append("rect")
                     .style("fill", function (d) {
                         return cols(d.label);
@@ -62,8 +62,8 @@
                         return x(d.postCount);
                     })
                     .attr("height", y.rangeBand())
-                    .on("click", function (d, i) {
-                        return drawWords(i);
+                    .on("click", function (d) {
+                        return drawWords(d.label);
                     });
 
             svg.append("g")
